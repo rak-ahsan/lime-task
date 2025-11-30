@@ -25,6 +25,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { getCookie } from "@/lib/utils";
 import { userAgent } from "next/server";
+import { calculateProductPricing } from "../../../lib/pricing";
 
 // Debounce hook for search input
 function useDebounce<T>(value: T, delay: number): T {
@@ -77,7 +78,8 @@ export default function PosPage() {
           `products?search=${debouncedSearchTerm}`,
           "token"
         );
-        setSearchResults(data);
+        setSearchResults(data.data.data);
+        console.log(data);
       } catch (error) {
         console.log("Error fetching search results:", error);
         toast.error("Failed to fetch products.");
@@ -92,8 +94,8 @@ export default function PosPage() {
   const handleProductSelect = useCallback(
     (product: Product) => {
       addItemToCart(product);
-      setSearchTerm(""); // Clear search after adding
-      setSearchResults([]); // Clear search results
+      // setSearchTerm(""); 
+      // setSearchResults([]); 
     },
     [addItemToCart]
   );
@@ -121,7 +123,7 @@ export default function PosPage() {
       return;
     }
 
-    setLoadingSearch(true); // Re-using loading state for sale processing
+    setLoadingSearch(true);
     try {
       // const token = localStorage.getItem('authToken');
       // if (!token) {
@@ -142,11 +144,10 @@ export default function PosPage() {
       };
 
       console.log(saleData);
-      
-      await api.post("pos", saleData, "token"); // Assuming your API has a /pos endpoint
+
+      await api.post("pos", saleData, "token");
       toast.success("Sale processed successfully!");
       clearCart();
-      // Optionally show a detailed breakdown or print receipt
     } catch (error) {
       console.log("Error processing sale:", error.message);
       toast.error("Failed to process sale.");
@@ -225,65 +226,55 @@ export default function PosPage() {
                 </TableHeader>
                 <TableBody>
                   {cart.map((item) => {
-                    const itemTotal = item.product.price * item.quantity;
-                    let itemDiscountAmount = 0;
-                    if (item.product.discount_details) {
-                      const { type, value } = item.product.discount_details;
-                      if (type === "percentage") {
-                        itemDiscountAmount = itemTotal * (value / 100);
-                      } else if (type === "fixed") {
-                        itemDiscountAmount = value * item.quantity;
-                      }
-                    }
-                    const finalItemPrice = itemTotal - itemDiscountAmount;
+                    const c = calculateProductPricing(item);
 
                     return (
                       <TableRow key={item.product.id}>
                         <TableCell className="font-medium">
                           {item.product.name}
-                          {item.product.trade_offer_details && (
+                          {c.freeQty > 0 && (
                             <p className="text-xs text-blue-500">
-                              {item.product.trade_offer_details}
+                              Free: {c.freeQty} items (Trade Offer)
                             </p>
                           )}
                         </TableCell>
+
                         <TableCell>${item.product.price}</TableCell>
+
                         <TableCell>
                           <Input
                             type="number"
                             value={item.quantity}
-                            onChange={(e) =>
-                              handleQuantityChange(
-                                item.product.id,
-                                e.target.value
-                              )
-                            }
-                            className="w-16 h-8 text-center"
                             min="1"
                             max={item.product.stock}
+                            className="w-16 h-8 text-center"
+                            onChange={(e) =>
+                              handleQuantityChange(item.product.id, e.target.value)
+                            }
                           />
                         </TableCell>
+
                         <TableCell>
-                          {item.product.discount_details
-                            ? item.product.discount_details.type ===
-                              "percentage"
-                              ? `${item.product.discount_details.value}%`
-                              : `$${item.product.discount_details.value}/item`
-                            : "N/A"}
+                          {item.product.discount ? `${item.product.discount}%` : "—"}
                         </TableCell>
-                        <TableCell>${finalItemPrice}</TableCell>
+
+                        <TableCell className="font-semibold">
+                          ${c.finalPrice.toFixed(2)}
+                        </TableCell>
+
                         <TableCell>
                           <Button
                             variant="destructive"
                             size="sm"
                             onClick={() => handleRemoveItem(item.product.id)}
                           >
-                            Remove
+                            X
                           </Button>
                         </TableCell>
                       </TableRow>
                     );
                   })}
+
                 </TableBody>
               </Table>
             )}

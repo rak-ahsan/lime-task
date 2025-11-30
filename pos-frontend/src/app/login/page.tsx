@@ -7,8 +7,9 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { api } from '@/lib/api';
-import { toast } from 'sonner'; // Using sonner for toasts
-import { setCookie } from '@/lib/utils'; // Import setCookie
+import { toast } from 'sonner';
+import { setCookie } from '@/lib/utils';
+import Link from 'next/link';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -24,7 +25,7 @@ export default function LoginPage() {
 
     try {
       const response = await api.post<{ token: string }>('login', { email, password });
-      setCookie('authToken', response.token, 7); // Store token in cookie for 7 days
+      setCookie('authToken', response.token, 7);
       toast.success('Login successful!');
       router.push('/');
     } catch (err: any) {
@@ -71,6 +72,12 @@ export default function LoginPage() {
               {loading ? 'Logging in...' : 'Login'}
             </Button>
           </form>
+          <p className="text-sm text-gray-500 pt-5 text-center">
+            Don't have an account?{" "}
+            <Link href="/register" className="text-blue-600 underline">
+              Register
+            </Link>
+          </p>
         </CardContent>
         <CardFooter className="flex justify-center text-sm text-gray-500">
           <p>&copy; {new Date().getFullYear()} POS System</p>

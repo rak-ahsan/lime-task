@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ProcessSaleRequest;
 use App\Services\PosService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use App\Helpers\ApiHelper;
 
 class PosController extends Controller
 {
@@ -15,27 +15,24 @@ class PosController extends Controller
         $this->posService = $posService;
     }
 
-    public function processSale(Request $request)
+    public function processSale(ProcessSaleRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'items' => 'required|array',
-            'items.*.product_id' => 'required|exists:products,id',
-            'items.*.quantity' => 'required|integer|min:1',
-        ]);
-
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
-        }
-
         try {
-            $result = $this->posService->processSale($request->items);
-            return response()->json([
-                'message' => 'Sale processed successfully',
-                'sale' => $result['sale'],
-                'updated_stock' => $result['updated_products'],
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json(['message' => $e->getMessage()], 400);
+            $result = $this->posService->processSale(
+                $request->validated()['items']
+            );
+
+            return ApiHelper::success([
+                'sale'           => $result['sale'],
+                'updated_stock'  => $result['updated_products'],
+            ], 'Sale processed successfully', 200);
+
+        } catch (\Throwable $e) {
+            return ApiHelper::error(
+                'Sale processing failed',
+                $e->getMessage(),
+                400
+            );
         }
     }
 }

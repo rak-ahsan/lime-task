@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RegisterRequest;
 use App\Services\AuthService;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
+use App\Helpers\ApiHelper;
+use Exception;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
 {
@@ -15,40 +18,35 @@ class AuthController extends Controller
         $this->authService = $authService;
     }
 
-    public function register(Request $request)
+    public function register(RegisterRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
-        ]);
+        try {
+            $user = $this->authService->register($request->validated());
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+            return ApiHelper::success($user, 'User registered successfully', 201);
+
+        } catch (Exception $e) {
+            Log::error('Register error: ' . $e->getMessage());
+            return ApiHelper::error('Registration failed', null, 500);
         }
-
-        $user = $this->authService->register($request->all());
-
-        return response()->json($user, 201);
     }
 
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|string|email',
-            'password' => 'required|string',
-        ]);
+        try {
+            $token = $this->authService->login($request->validated());
 
-        if ($validator->fails()) {
-            return response()->json($validator->errors(), 422);
+            if (!$token) {
+                return ApiHelper::error('Invalid credentials', null, 401);
+            }
+
+            return ApiHelper::success([
+                'token' => $token
+            ], 'Login successful', 200);
+
+        } catch (Exception $e) {
+            Log::error('Login error: ' . $e->getMessage());
+            return ApiHelper::error('Something went wrong during login', null, 500);
         }
-
-        $token = $this->authService->login($request->all());
-
-        if (!$token) {
-            return response()->json(['message' => 'Invalid credentials'], 401);
-        }
-
-        return response()->json(['token' => $token]);
     }
 }

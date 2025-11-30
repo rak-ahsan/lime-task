@@ -14,7 +14,7 @@ export interface Product {
   trade_offer_details?: string; // Example: "Buy one get one free"
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:9000/api'; // Assuming Laravel API runs on 8000
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api'; // Assuming Laravel API runs on 8000
 
 interface RequestOptions extends RequestInit {
   token?: string | null;

@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, ReactNode, useCallback } from 'react';
 import { Product } from '@/lib/api'; // Import Product from api.ts
+import { calculateProductPricing } from '../../lib/pricing';
 
 // Define the shape of an item in the cart
 export interface CartItem {
@@ -111,27 +112,26 @@ export function CartProvider({ children }: { children: ReactNode }) {
     return { price: effectivePrice - itemDiscount, discountAmount: itemDiscount };
   };
 
-  const calculateTotals = useCallback(() => {
-    let subtotal = 0;
-    let totalDiscount = 0;
-    let finalTotal = 0;
+function calculateTotals() {
+  let subtotal = 0;
+  let totalDiscount = 0;
+  let finalTotal = 0;
 
-    cart.forEach((item) => {
-      const itemOriginalPrice = item.product.price * item.quantity;
-      subtotal += itemOriginalPrice;
+  cart.forEach((item) => {
+    const calc = calculateProductPricing(item);
 
-      const { discountAmount } = calculateItemPrice(item);
-      totalDiscount += discountAmount;
-    });
+    subtotal += calc.itemTotal + calc.discountAmount;
+    totalDiscount += calc.discountAmount;
+    finalTotal += calc.finalPrice;
+  });
 
-    finalTotal = subtotal - totalDiscount;
+  return {
+    subtotal: subtotal.toFixed(2),
+    totalDiscount: totalDiscount.toFixed(2),
+    finalTotal: finalTotal.toFixed(2),
+  };
+}
 
-    return {
-      subtotal,
-      totalDiscount,
-      finalTotal,
-    };
-  }, [cart]);
 
   const value = React.useMemo(
     () => ({

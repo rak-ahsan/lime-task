@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
 
 class Sale extends Model
 {
+    use HasUuids;
     protected $fillable = [
         'user_id',
         'total_original_price',

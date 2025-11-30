@@ -6,9 +6,26 @@ use App\Models\Product;
 
 class ProductRepository
 {
-    public function getAll()
+    public function getAll($request)
     {
-        return Product::all();
+        $query = Product::query();
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where('name', 'LIKE', "%{$search}%");
+        }
+        if ($request->filled('sort_by')) {
+            $sortBy = $request->sort_by;
+            $sortDir = $request->sort_dir ?? 'asc';
+            if (in_array($sortBy, ['name', 'price', 'stock', 'created_at'])) {
+                $query->orderBy($sortBy, $sortDir);
+            }
+        } else {
+            $query->orderBy('id', 'desc'); 
+        }
+
+        $perPage = $request->per_page ?? 10;
+
+        return $query->paginate($perPage);
     }
 
     public function find($id)
