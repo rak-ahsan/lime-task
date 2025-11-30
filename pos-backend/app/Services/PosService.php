@@ -30,6 +30,7 @@ class PosService
         $now = now();
 
         foreach ($items as $item) {
+
             $product = $this->productRepository->find($item['product_id']);
             $qty = $item['quantity'];
 
@@ -37,43 +38,69 @@ class PosService
                 throw new \Exception('Product not found.');
             }
 
-            // Check available stock
+            // -----------------------------
+            // 1) VALIDATE STOCK
+            // -----------------------------
             if ($product->stock < $qty) {
                 throw new \Exception("Not enough stock for product {$product->name}");
             }
 
+            // Base price
             $originalPrice = $product->price * $qty;
+
             $discountAmount = 0;
             $tradeOfferValue = 0;
             $freeQuantity = 0;
 
-            // ---- 1) Apply Discount (if active) ------------------------------------
+            // -----------------------------
+            // 2) DISCOUNT
+            // -----------------------------
             $discountActive =
                 $product->discount &&
-                $now->between($product->discount_or_trade_offer_start_date, $product->discount_or_trade_offer_end_date);
+                $now->between(
+                    $product->discount_or_trade_offer_start_date,
+                    $product->discount_or_trade_offer_end_date
+                );
 
             if ($discountActive) {
                 $discountAmount = ($originalPrice * $product->discount) / 100;
             }
 
-            // ---- 2) Apply Trade Offer (Buy X Get Y Free) -------------------------
+            // -----------------------------
+            // 3) TRADE OFFER (Buy X Get Y Free)
+            // -----------------------------
             $tradeOfferActive =
                 $product->trade_offer_min_qty &&
-                $now->between($product->discount_or_trade_offer_start_date, $product->discount_or_trade_offer_end_date);
+                $now->between(
+                    $product->discount_or_trade_offer_start_date,
+                    $product->discount_or_trade_offer_end_date
+                );
 
             if ($tradeOfferActive && $qty >= $product->trade_offer_min_qty) {
                 $eligibleTimes = floor($qty / $product->trade_offer_min_qty);
                 $freeQuantity = $eligibleTimes * $product->trade_offer_get_qty;
 
-                // Free qty reduces price equivalent
+                // free qty price reduction
                 $tradeOfferValue = $freeQuantity * $product->price;
             }
 
-            // Prevent both double counting
+            // -----------------------------
+            // 4) FINAL PRICE
+            // -----------------------------
             $finalPrice = $originalPrice - $discountAmount - $tradeOfferValue;
 
-            // ---- 3) STOCK VALIDATION WITH MIN STOCK ------------------------------
-            $newStock = $product->stock - $qty;
+            // -----------------------------
+            // 5) STOCK REDUCTION (IMPORTANT FIX)
+            // -----------------------------
+
+            /**
+             * You MUST subtract both:
+             *  - paid quantity
+             *  - free quantity
+             */
+            $totalQtyUsed = $qty + $freeQuantity;
+
+            $newStock = $product->stock - $totalQtyUsed;
 
             if ($newStock < $product->min_stock) {
                 throw new \Exception("Selling this quantity will break min stock for {$product->name}");
@@ -82,32 +109,36 @@ class PosService
             // Update stock
             $this->productRepository->update($product, ['stock' => $newStock]);
 
-            // ---- 4) Prepare data for sale record --------------------------------
+            // -----------------------------
+            // 6) BUILD SALE LINE ITEM
+            // -----------------------------
             $saleItems[] = [
                 'product_id' => $product->id,
                 'quantity' => $qty,
+                'free_quantity' => $freeQuantity,
                 'original_price' => $originalPrice,
                 'discount_amount' => $discountAmount,
                 'trade_offer_value' => $tradeOfferValue,
                 'final_price' => $finalPrice,
-                'free_quantity' => $freeQuantity,
             ];
 
             $updatedProducts[] = [
                 'product_id' => $product->id,
-                'updated_stock' => $newStock
+                'updated_stock' => $newStock,
             ];
 
-            // Accumulate totals
+            // ACCUMULATE TOTALS
             $totalOriginal += $originalPrice;
             $totalDiscount += $discountAmount;
             $totalTradeOfferValue += $tradeOfferValue;
             $totalFinal += $finalPrice;
         }
 
-        // Save sale (with items)
+        // -----------------------------
+        // 7) CREATE SALE
+        // -----------------------------
         $sale = $this->saleRepository->create([
-            'user_id' => 1,
+            'user_id' => '019ad5ea-93ae-715b-8bc6-aef1cb504cbb', // Replace with Auth::id()
             'total_original_price' => $totalOriginal,
             'total_discount_amount' => $totalDiscount,
             'total_offer_amount' => $totalTradeOfferValue,
