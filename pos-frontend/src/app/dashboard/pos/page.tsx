@@ -25,7 +25,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { getCookie } from "@/lib/utils";
 import { userAgent } from "next/server";
-import { calculateProductPricing } from "../../../lib/pricing";
+import { calculateProductPricing } from "../../../../lib/pricing";
 
 // Debounce hook for search input
 function useDebounce<T>(value: T, delay: number): T {
@@ -157,8 +157,14 @@ export default function PosPage() {
   };
 
   return (
-    <div className="flex min-h-screen p-4 bg-gray-100">
-      <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div className="min-h-screen">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Point of Sale</h1>
+        <p className="text-muted-foreground">
+          Process sales and manage transactions.
+        </p>
+      </div>
+      <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
         {/* Product Search & Selection */}
         <Card className="col-span-full md:col-span-1 h-fit">
           <CardHeader>

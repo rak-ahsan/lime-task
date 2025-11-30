@@ -29,8 +29,8 @@ export default function LoginPage() {
       toast.success('Login successful!');
       router.push('/');
     } catch (err: any) {
-      setError(err.message || 'Login failed. Please check your credentials.');
-      toast.error(err.message || 'Login failed.');
+      setError('Login failed. Please check your credentials.');
+      toast.error('Login failed. Please check your credentials.');
     }
     finally {
       setLoading(false);
@@ -38,7 +38,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-100">
+    <div className="flex min-h-screen items-center justify-center ">
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl">Login</CardTitle>

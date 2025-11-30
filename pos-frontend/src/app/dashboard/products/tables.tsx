@@ -116,7 +116,7 @@ export default function ProductsTable({ initialData }) {
   // RENDER
   // -----------------------------
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 100vh">
       {/* Search */}
       <div className="flex items-center justify-between mb-2">
         <Input
@@ -136,7 +136,7 @@ export default function ProductsTable({ initialData }) {
       {/* Table */}
       <Table className="rounded-md border">
         <TableHeader>
-          <TableRow className="bg-gray-50">
+          <TableRow className="">
             <TableHead className="w-10">
               <Checkbox checked={allSelected} onCheckedChange={toggleSelectAll} />
             </TableHead>
