@@ -38,23 +38,20 @@ class PosService
                 throw new \Exception('Product not found.');
             }
 
-            // -----------------------------
-            // 1) VALIDATE STOCK
-            // -----------------------------
+            // validate stock
+
             if ($product->stock < $qty) {
                 throw new \Exception("Not enough stock for product {$product->name}");
             }
 
-            // Base price
+            // base price
             $originalPrice = $product->price * $qty;
 
             $discountAmount = 0;
             $tradeOfferValue = 0;
             $freeQuantity = 0;
 
-            // -----------------------------
-            // 2) DISCOUNT
-            // -----------------------------
+            // discount
             $discountActive =
                 $product->discount &&
                 $now->between(
@@ -66,9 +63,7 @@ class PosService
                 $discountAmount = ($originalPrice * $product->discount) / 100;
             }
 
-            // -----------------------------
-            // 3) TRADE OFFER (Buy X Get Y Free)
-            // -----------------------------
+            // trade offer (buy x get y free)
             $tradeOfferActive =
                 $product->trade_offer_min_qty &&
                 $now->between(
@@ -84,34 +79,22 @@ class PosService
                 $tradeOfferValue = $freeQuantity * $product->price;
             }
 
-            // -----------------------------
-            // 4) FINAL PRICE
-            // -----------------------------
+            // final price
             $finalPrice = $originalPrice - $discountAmount - $tradeOfferValue;
 
-            // -----------------------------
-            // 5) STOCK REDUCTION (IMPORTANT FIX)
-            // -----------------------------
-
-            /**
-             * You MUST subtract both:
-             *  - paid quantity
-             *  - free quantity
-             */
             $totalQtyUsed = $qty + $freeQuantity;
 
             $newStock = $product->stock - $totalQtyUsed;
 
-            if ($newStock < $product->min_stock) {
+            if ($newStock < 5) {
+                //send push notification or notification or sms logic can be added here
                 throw new \Exception("Selling this quantity will break min stock for {$product->name}");
             }
 
-            // Update stock
+            // update stock
             $this->productRepository->update($product, ['stock' => $newStock]);
 
-            // -----------------------------
-            // 6) BUILD SALE LINE ITEM
-            // -----------------------------
+            // build sale line item
             $saleItems[] = [
                 'product_id' => $product->id,
                 'quantity' => $qty,
@@ -127,16 +110,13 @@ class PosService
                 'updated_stock' => $newStock,
             ];
 
-            // ACCUMULATE TOTALS
             $totalOriginal += $originalPrice;
             $totalDiscount += $discountAmount;
             $totalTradeOfferValue += $tradeOfferValue;
             $totalFinal += $finalPrice;
         }
 
-        // -----------------------------
-        // 7) CREATE SALE
-        // -----------------------------
+        // create sale
         $sale = $this->saleRepository->create([
             'user_id' => Auth::id(),
             'total_original_price' => $totalOriginal,
