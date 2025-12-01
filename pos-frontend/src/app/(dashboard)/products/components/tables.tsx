@@ -1,4 +1,3 @@
-// app/(dashboard)/products/ProductsTable.tsx
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -12,7 +11,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import SearchBox from "./SearchBox";
 import PaginationLinks from "./PaginationLinks";
-
+import ProductForm from "./create/product-create-form"; // <— updated
 
 export default function ProductsTable({ data }) {
   const { data: products, current_page, last_page } = data;
@@ -20,7 +19,10 @@ export default function ProductsTable({ data }) {
   return (
     <div className="space-y-6">
       {/* Search */}
-      <SearchBox />
+      <div className="flex justify-between">
+        <SearchBox />
+        <ProductForm />
+      </div>
 
       <Table className="rounded-md border">
         <TableHeader>
@@ -33,13 +35,14 @@ export default function ProductsTable({ data }) {
             <TableHead>Min</TableHead>
             <TableHead>Discount</TableHead>
             <TableHead>Trade Offer</TableHead>
+            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
 
         <TableBody>
           {products.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={8} className="text-center py-6 text-gray-500">
+              <TableCell colSpan={9} className="text-center py-6 text-gray-500">
                 No products found.
               </TableCell>
             </TableRow>
@@ -47,16 +50,12 @@ export default function ProductsTable({ data }) {
             products.map((p) => (
               <TableRow
                 key={p.id}
-                className={
-                  p.stock <= p.min_stock ? "bg-red-50/50" : ""
-                }
+                className={p.stock <= p.min_stock ? "bg-red-50/50" : ""}
               >
                 <TableCell>
-                  <Image
+                  <img
                     src={p.image}
                     alt={p.name}
-                    width={48}
-                    height={48}
                     className="h-12 w-12 object-cover rounded-md border"
                   />
                 </TableCell>
@@ -92,6 +91,11 @@ export default function ProductsTable({ data }) {
                   ) : (
                     <span className="text-gray-400">—</span>
                   )}
+                </TableCell>
+
+                {/* EDIT BUTTON */}
+                <TableCell>
+                  <ProductForm product={p} />
                 </TableCell>
               </TableRow>
             ))

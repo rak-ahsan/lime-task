@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-    use HasFactory,HasUuids ;
+    use HasFactory, HasUuids;
+
     protected $fillable = [
         'name',
         'price',
@@ -17,7 +18,13 @@ class Product extends Model
         'trade_offer_min_qty',
         'trade_offer_get_qty',
         'discount',
+        'image',
         'discount_or_trade_offer_start_date',
         'discount_or_trade_offer_end_date',
     ];
+
+    public function getImageAttribute($value)
+    {
+        return $value ? asset($value) : null;
+    }
 }

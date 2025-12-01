@@ -1,4 +1,5 @@
 import { fetchProducts } from "../../../../lib/fetchProducts";
+import ProductCreate from "./components/create/product-create-form";
 import ProductsTable from "./components/tables";
 
 export default async function ProductsPage({ searchParams }) {
@@ -10,8 +11,7 @@ export default async function ProductsPage({ searchParams }) {
     page,
     per_page: 15,
     search,
-  });
-
+  });  
   return (
     <div className="space-y-8">
       <div>
@@ -23,6 +23,7 @@ export default async function ProductsPage({ searchParams }) {
 
       <div className="bg-card border rounded-xl p-4">
         <ProductsTable data={response.data} />
+
       </div>
     </div>
   );

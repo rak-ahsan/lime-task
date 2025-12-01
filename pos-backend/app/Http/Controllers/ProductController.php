@@ -31,6 +31,7 @@ class ProductController extends Controller
     public function store(StoreProductRequest $request)
     {
         try {
+            
             $product = $this->productService->createProduct($request->validated());
 
             return ApiHelper::success(
@@ -49,6 +50,9 @@ class ProductController extends Controller
 
     public function update(UpdateProductRequest $request, string $id)
     {
+
+        return $request;
+        
         try {
             $product = $this->productService->updateProduct($id, $request->validated());
 

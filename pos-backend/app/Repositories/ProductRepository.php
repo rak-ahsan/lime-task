@@ -20,7 +20,7 @@ class ProductRepository
                 $query->orderBy($sortBy, $sortDir);
             }
         } else {
-            $query->orderBy('id', 'desc'); 
+            $query->orderBy('id', 'desc');
         }
 
         $perPage = $request->per_page ?? 10;
@@ -35,14 +35,32 @@ class ProductRepository
 
     public function create(array $data)
     {
+        if (isset($data['image']) && $data['image'] instanceof \Illuminate\Http\UploadedFile) {
+
+            $filename = time() . '_' . uniqid() . '.' . $data['image']->getClientOriginalExtension();
+
+            $data['image']->move(public_path('products'), $filename);
+
+            $data['image'] = 'products/' . $filename;
+        }
         return Product::create($data);
     }
 
+
     public function update(Product $product, array $data)
     {
+        if (isset($data['image']) && $data['image'] instanceof \Illuminate\Http\UploadedFile) {
+            if ($product->image && file_exists(public_path($product->image))) {
+                @unlink(public_path($product->image));
+            }
+            $filename = time() . '_' . uniqid() . '.' . $data['image']->getClientOriginalExtension();
+            $data['image']->move(public_path('products'), $filename);
+            $data['image'] = 'products/' . $filename;
+        }
         $product->update($data);
         return $product;
     }
+
 
     public function delete(Product $product)
     {
