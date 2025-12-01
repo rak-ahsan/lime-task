@@ -1,16 +1,19 @@
 import { fetchProducts } from "../../../../lib/fetchProducts";
-import ProductsTable from "./tables";
+import ProductsTable from "./components/tables";
 
-export default async function ProductsPage() {
-  const initialResponse = await fetchProducts({
-    page: 1,
-    per_page: 10,
+export default async function ProductsPage({ searchParams }) {
+  const params = await searchParams;
+  const page = Number(params.page ?? 1);
+  const search = params.search ?? "";
+
+  const response = await fetchProducts({
+    page,
+    per_page: 15,
+    search,
   });
 
   return (
     <div className="space-y-8">
-
-      {/* Page Header */}
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Products</h1>
         <p className="text-muted-foreground">
@@ -18,11 +21,9 @@ export default async function ProductsPage() {
         </p>
       </div>
 
-      {/* Products Table */}
       <div className="bg-card border rounded-xl p-4">
-        <ProductsTable initialData={initialResponse.data} />
+        <ProductsTable data={response.data} />
       </div>
-
     </div>
   );
 }

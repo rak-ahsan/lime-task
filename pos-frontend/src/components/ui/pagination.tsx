@@ -4,6 +4,7 @@ import {
   ChevronRightIcon,
   MoreHorizontalIcon,
 } from "lucide-react"
+import { Slot } from "@radix-ui/react-slot"
 
 import { cn } from "@/lib/utils"
 import { Button, buttonVariants } from "@/components/ui/button"
@@ -48,6 +49,7 @@ function PaginationItem({ ...props }: React.ComponentProps<"li">) {
 // -----------------------------
 type PaginationLinkProps = {
   isActive?: boolean
+  asChild?: boolean
 } & Omit<React.ComponentProps<typeof Button>, "size"> & {
     size?: "default" | "icon"
   }
@@ -56,10 +58,13 @@ function PaginationLink({
   className,
   isActive,
   size = "icon",
+  asChild = false,
   ...props
 }: PaginationLinkProps) {
+  const Comp = asChild ? Slot : "a"
+  
   return (
-    <a
+    <Comp
       aria-current={isActive ? "page" : undefined}
       data-slot="pagination-link"
       data-active={isActive}
@@ -76,45 +81,64 @@ function PaginationLink({
 }
 
 // -----------------------------
-// Previous Button (fix: remove incoming size)
+// Previous Button
 // -----------------------------
 function PaginationPrevious({
   className,
-  // ❗ ignore incoming size to avoid "size specified more than once"
   size: _ignored,
+  asChild = false,
   ...props
-}: Omit<PaginationLinkProps, "size">) {
+}: Omit<PaginationLinkProps, "size"> & { asChild?: boolean }) {
+  const Comp = asChild ? Slot : "a"
+  
   return (
-    <PaginationLink
+    <Comp
       aria-label="Go to previous page"
-      size="default"
-      className={cn("gap-1 px-2.5 sm:pl-2.5", className)}
+      data-slot="pagination-link"
+      className={cn(
+        buttonVariants({
+          variant: "ghost",
+          size: "default",
+        }),
+        "gap-1 px-2.5 sm:pl-2.5",
+        className
+      )}
       {...props}
     >
       <ChevronLeftIcon className="size-4" />
       <span className="hidden sm:block">Previous</span>
-    </PaginationLink>
+    </Comp>
   )
 }
 
 // -----------------------------
-// Next Button (same fix as Previous)
+// Next Button
 // -----------------------------
 function PaginationNext({
   className,
   size: _ignored,
+  asChild = false,
   ...props
-}: Omit<PaginationLinkProps, "size">) {
+}: Omit<PaginationLinkProps, "size"> & { asChild?: boolean }) {
+  const Comp = asChild ? Slot : "a"
+  
   return (
-    <PaginationLink
+    <Comp
       aria-label="Go to next page"
-      size="default"
-      className={cn("gap-1 px-2.5 sm:pr-2.5", className)}
+      data-slot="pagination-link"
+      className={cn(
+        buttonVariants({
+          variant: "ghost",
+          size: "default",
+        }),
+        "gap-1 px-2.5 sm:pr-2.5",
+        className
+      )}
       {...props}
     >
       <span className="hidden sm:block">Next</span>
       <ChevronRightIcon className="size-4" />
-    </PaginationLink>
+    </Comp>
   )
 }
 

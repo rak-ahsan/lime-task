@@ -27,10 +27,9 @@ export default function LoginPage() {
       const response = await api.post<{
         data: any; token: string
       }>('login', { email, password });
-      console.log(response);
       setCookie('authToken', response.data.token, 7);
       toast.success('Login successful!');
-      router.push('/dashboard');
+      router.push('/');
     } catch (err: unknown) {
       const errorMessage = err && typeof err === 'object' && 'message' in err
         ? String(err.message)

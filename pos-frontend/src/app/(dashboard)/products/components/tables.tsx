@@ -1,0 +1,105 @@
+// app/(dashboard)/products/ProductsTable.tsx
+import Image from "next/image";
+import Link from "next/link";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import SearchBox from "./SearchBox";
+import PaginationLinks from "./PaginationLinks";
+
+
+export default function ProductsTable({ data }) {
+  const { data: products, current_page, last_page } = data;
+
+  return (
+    <div className="space-y-6">
+      {/* Search */}
+      <SearchBox />
+
+      <Table className="rounded-md border">
+        <TableHeader>
+          <TableRow>
+            <TableHead>Image</TableHead>
+            <TableHead>ID</TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead>Price</TableHead>
+            <TableHead>Stock</TableHead>
+            <TableHead>Min</TableHead>
+            <TableHead>Discount</TableHead>
+            <TableHead>Trade Offer</TableHead>
+          </TableRow>
+        </TableHeader>
+
+        <TableBody>
+          {products.length === 0 ? (
+            <TableRow>
+              <TableCell colSpan={8} className="text-center py-6 text-gray-500">
+                No products found.
+              </TableCell>
+            </TableRow>
+          ) : (
+            products.map((p) => (
+              <TableRow
+                key={p.id}
+                className={
+                  p.stock <= p.min_stock ? "bg-red-50/50" : ""
+                }
+              >
+                <TableCell>
+                  <Image
+                    src={p.image}
+                    alt={p.name}
+                    width={48}
+                    height={48}
+                    className="h-12 w-12 object-cover rounded-md border"
+                  />
+                </TableCell>
+
+                <TableCell>{p.id}</TableCell>
+                <TableCell className="font-medium">{p.name}</TableCell>
+                <TableCell>${p.price}</TableCell>
+
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    {p.stock}
+                    {p.stock <= p.min_stock && (
+                      <Badge variant="destructive">Low</Badge>
+                    )}
+                  </div>
+                </TableCell>
+
+                <TableCell>{p.min_stock}</TableCell>
+
+                <TableCell>
+                  {p.discount ? (
+                    <Badge variant="secondary">{p.discount}%</Badge>
+                  ) : (
+                    <span className="text-gray-400">—</span>
+                  )}
+                </TableCell>
+
+                <TableCell>
+                  {p.trade_offer_min_qty ? (
+                    <Badge variant="outline">
+                      Buy {p.trade_offer_min_qty} → Free {p.trade_offer_get_qty}
+                    </Badge>
+                  ) : (
+                    <span className="text-gray-400">—</span>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))
+          )}
+        </TableBody>
+      </Table>
+
+      <PaginationLinks current={current_page} last={last_page} />
+    </div>
+  );
+}

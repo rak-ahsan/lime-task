@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function NotFound() {
   return (
     <div className="h-screen w-full flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-gray-100 via-white to-gray-200 dark:from-zinc-950 dark:via-zinc-900 dark:to-zinc-950">
@@ -20,7 +22,7 @@ export default function NotFound() {
           or is temporarily unavailable.
         </p>
 
-        <a
+        <Link
           href="/"
           className="
             inline-block px-6 py-3 text-white font-medium rounded-lg
@@ -30,7 +32,7 @@ export default function NotFound() {
           "
         >
           ⟵ Back to Home
-        </a>
+        </Link>
       </div>
     </div>
   );

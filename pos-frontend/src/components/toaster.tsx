@@ -8,7 +8,6 @@ export function Toaster() {
       richColors
       position="top-right"
       toastOptions={{
-        // Default style for toasts
         unstyled: false,
         classNames: {
           toast: 'flex items-center gap-2 rounded-md p-3 text-sm font-medium',
