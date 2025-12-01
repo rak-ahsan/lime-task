@@ -138,7 +138,7 @@ class PosService
         // 7) CREATE SALE
         // -----------------------------
         $sale = $this->saleRepository->create([
-            'user_id' => '019ad5ea-93ae-715b-8bc6-aef1cb504cbb', // Replace with Auth::id()
+            'user_id' => Auth::id(),
             'total_original_price' => $totalOriginal,
             'total_discount_amount' => $totalDiscount,
             'total_offer_amount' => $totalTradeOfferValue,

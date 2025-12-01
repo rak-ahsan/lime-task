@@ -26,8 +26,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import { api } from "@/lib/api";
+import { Product } from "../../../../types/types";
+import Image from "next/image";
 
-export default function ProductsTable({ initialData }) {
+export default function ProductsTable({ initialData }: { initialData: Product[] }) {
   const [data, setData] = useState(initialData);
   const [page, setPage] = useState(initialData.current_page);
 
@@ -232,7 +234,9 @@ export default function ProductsTable({ initialData }) {
 
                   {/* IMAGE */}
                   <TableCell>
-                    <img
+                    <Image
+                     width={12}
+                     height={12}
                       src={p.image}
                       alt={p.name}
                       className="h-12 w-12 rounded-md object-cover border"

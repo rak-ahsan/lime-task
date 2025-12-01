@@ -1,11 +1,8 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
-
 export function setCookie(name: string, value: string, days: number) {
+  if (typeof window === 'undefined') return; 
+  
   let expires = "";
   if (days) {
     const date = new Date();
@@ -16,6 +13,8 @@ export function setCookie(name: string, value: string, days: number) {
 }
 
 export function getCookie(name: string) {
+  if (typeof window === 'undefined') return null;
+  
   const nameEQ = name + "=";
   const ca = document.cookie.split(";");
   for (let i = 0; i < ca.length; i++) {
@@ -27,5 +26,13 @@ export function getCookie(name: string) {
 }
 
 export function eraseCookie(name: string) {
+  if (typeof window === 'undefined') return; 
+  
   document.cookie = `${name}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
+}
+
+
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
 }

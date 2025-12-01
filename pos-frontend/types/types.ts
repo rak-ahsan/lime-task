@@ -35,11 +35,16 @@ export type DiscountDetails = {
   customer_group_overrides?: Partial<Record<CustomerGroup, { type: "percentage" | "fixed"; value: number }>>;
 };
 
-export type Product = {
+
+export interface Product {
   id: string;
   name: string;
-  price: number; // unit price
+  price: number;
   stock: number;
-  min_stock?: number;
-  discount_details?: DiscountDetails;
-};
+  min_stock: number;
+  discount_details?: {
+    type: 'percentage' | 'fixed';
+    value: number;
+  };
+  trade_offer_details?: string; 
+}

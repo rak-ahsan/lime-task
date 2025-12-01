@@ -20,12 +20,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useEffect, useState, useCallback } from "react";
-import { api, Product } from "@/lib/api"; // Assuming Product is also exported from api.ts
+import { api } from "@/lib/api"; // Assuming Product is also exported from api.ts
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { getCookie } from "@/lib/utils";
 import { userAgent } from "next/server";
 import { calculateProductPricing } from "../../../../lib/pricing";
+import { Product } from "../../../../types/types";
 
 // Debounce hook for search input
 function useDebounce<T>(value: T, delay: number): T {
@@ -68,15 +69,14 @@ export default function PosPage() {
       }
       setLoadingSearch(true);
       try {
-        // const token = getCookie('authToken');
-        // if (!token) {
-        //   router.push('/login');
-        //   return;
-        // }
-        // Assuming your API has a search endpoint like /products?search=...
+        const token = getCookie('authToken');
+        if (!token) {
+          router.push('/login');
+          return;
+        }
         const data = await api.get<Product[]>(
           `products?search=${debouncedSearchTerm}`,
-          "token"
+          token
         );
         setSearchResults(data.data.data);
         console.log(data);
@@ -125,11 +125,11 @@ export default function PosPage() {
 
     setLoadingSearch(true);
     try {
-      // const token = localStorage.getItem('authToken');
-      // if (!token) {
-      //   router.push('/login');
-      //   return;
-      // }
+        const token = getCookie('authToken');
+      if (!token) {
+        router.push('/login');
+        return;
+      }
 
       const saleData = {
         items: cart.map((item) => ({
@@ -145,7 +145,7 @@ export default function PosPage() {
 
       console.log(saleData);
 
-      await api.post("pos", saleData, "token");
+      await api.post("pos", saleData, token);
       toast.success("Sale processed successfully!");
       clearCart();
     } catch (error) {

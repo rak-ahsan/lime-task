@@ -42,10 +42,10 @@ export default function Sidebar() {
       {/* SCROLLABLE NAV AREA */}
       <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-muted hover:scrollbar-thumb-muted/70">
         <nav className="flex flex-col gap-1 mt-4 px-3 pb-10">
-          <NavItem open={open} icon={<LayoutDashboard />} label="Overview" link="/dashboard" />
-          <NavItem open={open} icon={<ShoppingBag />} label="Products" link="/dashboard/products" />
-          <NavItem open={open} icon={<BarChart2 />} label="POS" link="/dashboard/pos" />
-          <NavItem open={open} icon={<Settings />} label="Settings" link="/dashboard/settings" />
+          <NavItem open={open} icon={<LayoutDashboard />} label="Overview" link="/" />
+          <NavItem open={open} icon={<ShoppingBag />} label="Products" link="/products" />
+          <NavItem open={open} icon={<BarChart2 />} label="POS" link="/pos" />
+          <NavItem open={open} icon={<Settings />} label="Settings" link="/settings" />
 
           {/* Example: Add many to test scroll */}
           {/* [...Array(20)].map(_,i => <NavItem ... />) */}
