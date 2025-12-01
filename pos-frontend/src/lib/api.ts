@@ -3,7 +3,6 @@ import { redirect } from 'next/navigation';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:8000/api';
 
-// Custom error for unauthorized access
 export class UnauthorizedError extends Error {
   constructor(message = 'Unauthorized') {
     super(message);
@@ -15,10 +14,8 @@ interface RequestOptions extends RequestInit {
   token?: string | null;
 }
 
-// Helper to get server-side cookies dynamically
 async function getServerCookie(name: string): Promise<string | null> {
   try {
-    // Dynamic import only on server side
     const { cookies } = await import('next/headers');
     const cookieStore = await cookies();
     return cookieStore.get(name)?.value || null;
@@ -41,15 +38,12 @@ async function apiFetch<T>(
     },
   };
 
-  // Get auth token from multiple sources
   let authToken = token;
   
   if (!authToken) {
     if (typeof window !== 'undefined') {
-      // Client-side: use document.cookie
       authToken = getCookie('authToken');
     } else {
-      // Server-side: use Next.js cookies with dynamic import
       authToken = await getServerCookie('authToken');
     }
   }
@@ -66,17 +60,14 @@ async function apiFetch<T>(
   if (!response.ok) {
     if (response.status === 401) {
       if (typeof window !== 'undefined') {
-        // Client-side redirect
         eraseCookie('authToken');
         window.location.href = '/login';
         throw new UnauthorizedError();
       } else {
-        // Server-side redirect
         redirect('/login');
       }
     }
     
-    // Handle other errors
     try {
       const error = await response.json();
       return Promise.reject(error);

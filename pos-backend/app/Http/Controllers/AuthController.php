@@ -49,4 +49,11 @@ class AuthController extends Controller
             return ApiHelper::error('Something went wrong during login', null, 500);
         }
     }
+
+    public function logout()
+    {
+        $this->authService->logout();
+
+        return ApiHelper::success(null, 'Logout successful', 200);
+    }
 }

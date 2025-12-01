@@ -29,4 +29,6 @@ use App\Http\Controllers\PosController;
         Route::post('/products', [ProductController::class, 'store']);
         Route::put('/products/{id}', [ProductController::class, 'update']);
         Route::post('/pos', [PosController::class, 'processSale']);
+        
+        Route::post('/logout', [AuthController::class, 'logout']);
     });

@@ -9,9 +9,6 @@ export function calculateProductPricing(item) {
 
   const now = new Date();
 
-  // ---------------------------
-  // 1) TIME WINDOW DISCOUNT
-  // ---------------------------
   if (p.discount && p.discount_or_trade_offer_start_date && p.discount_or_trade_offer_end_date) {
     const start = new Date(p.discount_or_trade_offer_start_date);
     const end = new Date(p.discount_or_trade_offer_end_date);
@@ -22,9 +19,6 @@ export function calculateProductPricing(item) {
     }
   }
 
-  // ---------------------------
-  // 2) TRADE OFFER: BUY X GET Y FREE
-  // ---------------------------
   if (p.trade_offer_min_qty && p.trade_offer_get_qty) {
     const min = Number(p.trade_offer_min_qty);
     const get = Number(p.trade_offer_get_qty);
