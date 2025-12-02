@@ -31,7 +31,7 @@ const SaleBreakDown = ({
         </DialogHeader>
 
         <div className="mt-4 space-y-3">
-          {breakdown.items.map((it, idx) => (
+          {breakdown.items.map((it:any, idx) => (
             <div
               key={`${String(it.product_id)}-${idx}`}
               className="border rounded-lg p-4 bg-gray-50"

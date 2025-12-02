@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { calculateProductPricing } from "../../../../../lib/pricing";
 import { useCart } from "@/context/cart-context";
+import { Product } from "../../../../../types/types";
 
 export default function CartTable({
   onQtyChange,
@@ -53,10 +54,9 @@ export default function CartTable({
             </TableHeader>
 
             <TableBody>
-              {cart.map((item) => {
+              {cart.map((item:any) => {
                 const c = calculateProductPricing(item);
                 
-                // Check if discount/trade offer is currently active
                 const now = new Date();
                 const startDate = item.product.discount_or_trade_offer_start_date 
                   ? new Date(item.product.discount_or_trade_offer_start_date) 
