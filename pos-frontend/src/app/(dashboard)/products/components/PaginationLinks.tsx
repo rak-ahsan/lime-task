@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
 
-export default function Pagination({ current, last }) {
+export default function Pagination({ current, last }: { current: number; last: number }) {
   const searchParams = useSearchParams();
 
   const getUrl = (page: number) => {
@@ -51,9 +51,6 @@ export default function Pagination({ current, last }) {
   );
 }
 
-// ----------------------------------------------------------------
-// Page Button (Shadcn-styled but fully custom & simplified)
-// ----------------------------------------------------------------
 function PageButton({
   href,
   disabled,
@@ -99,9 +96,7 @@ function PageButton({
   );
 }
 
-// ----------------------------------------------------------------
-// Icons styled like Shadcn pagination
-// ----------------------------------------------------------------
+
 function ChevronLeft() {
   return (
     <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none">

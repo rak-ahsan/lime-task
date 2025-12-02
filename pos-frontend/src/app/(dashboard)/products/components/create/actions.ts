@@ -46,8 +46,6 @@ export async function updateProductAction(id: number, formData: FormData) {
       body: formData,
     });
 
-    console.log(response);
-
     if (!response.success) {
       return {
         success: false,

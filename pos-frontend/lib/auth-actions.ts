@@ -8,7 +8,7 @@ export async function logout() {
   const token = cookieStore.get('authToken')?.value;
 
   try {
-    await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/logout`, {
+    await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/auth/logout`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,

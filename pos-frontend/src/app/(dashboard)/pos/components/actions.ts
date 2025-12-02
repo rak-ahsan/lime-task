@@ -14,9 +14,9 @@ export async function searchProductsAction(term: string) {
   return json.data.data;
 }
 
-export async function processSaleAction(payload: any) {
+export async function processSaleAction(payload:unknown) {
   try {
-    await api.post("pos", payload);
+    await api.post("pos/sale", payload);
     revalidateTag("products", "default");
     return { success: true };
 

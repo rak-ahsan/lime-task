@@ -11,14 +11,25 @@ import {
 import { Badge } from "@/components/ui/badge";
 import SearchBox from "./SearchBox";
 import PaginationLinks from "./PaginationLinks";
-import ProductForm from "./create/product-create-form"; // <— updated
+import ProductForm from "./create/product-create-form";
+import { Product } from "../../../../../types/types";
 
-export default function ProductsTable({ data }) {
+interface ProductsResponse {
+  data: Product[];
+  current_page: number;
+  last_page: number;
+}
+
+interface ProductsTableProps {
+  data: ProductsResponse;
+}
+
+export default function ProductsTable({ data }: ProductsTableProps) {
   const { data: products, current_page, last_page } = data;
 
   return (
     <div className="space-y-6">
-      {/* Search */}
+      {/* Search & Create */}
       <div className="flex justify-between">
         <SearchBox />
         <ProductForm />
@@ -31,11 +42,9 @@ export default function ProductsTable({ data }) {
             <TableHead>ID</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Price</TableHead>
-            <TableHead>Stock</TableHead>
-            <TableHead>Min</TableHead>
+            <TableHead colSpan={2}>Stock</TableHead>
             <TableHead>Discount</TableHead>
             <TableHead>Trade Offer</TableHead>
-            <TableHead>Actions</TableHead>
           </TableRow>
         </TableHeader>
 
@@ -47,12 +56,17 @@ export default function ProductsTable({ data }) {
               </TableCell>
             </TableRow>
           ) : (
-            products.map((p) => (
+            products.map((p: Product) => (
               <TableRow
                 key={p.id}
-                className={p.stock <= p.min_stock ? "bg-red-50/50" : ""}
+                className={
+                  p.stock < 10 || p.stock <= p.min_stock
+                    ? "bg-red-50/50"
+                    : ""
+                }
               >
                 <TableCell>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={p.image}
                     alt={p.name}
@@ -64,17 +78,22 @@ export default function ProductsTable({ data }) {
                 <TableCell className="font-medium">{p.name}</TableCell>
                 <TableCell>${p.price}</TableCell>
 
+                {/* Stock — with Low Stock logic */}
                 <TableCell>
                   <div className="flex items-center gap-2">
                     {p.stock}
-                    {p.stock <= p.min_stock && (
+
+                    {p.stock < 50 ? (
+                      <Badge variant="destructive">Low Stock</Badge>
+                    ) : p.stock <= 20 ? (
                       <Badge variant="destructive">Low</Badge>
-                    )}
+                    ) : null}
                   </div>
                 </TableCell>
 
                 <TableCell>{p.min_stock}</TableCell>
 
+                {/* Discount */}
                 <TableCell>
                   {p.discount ? (
                     <Badge variant="secondary">{p.discount}%</Badge>
@@ -83,6 +102,7 @@ export default function ProductsTable({ data }) {
                   )}
                 </TableCell>
 
+                {/* Trade Offer */}
                 <TableCell>
                   {p.trade_offer_min_qty ? (
                     <Badge variant="outline">
@@ -91,11 +111,6 @@ export default function ProductsTable({ data }) {
                   ) : (
                     <span className="text-gray-400">—</span>
                   )}
-                </TableCell>
-
-                {/* EDIT BUTTON */}
-                <TableCell>
-                  <ProductForm product={p} />
                 </TableCell>
               </TableRow>
             ))

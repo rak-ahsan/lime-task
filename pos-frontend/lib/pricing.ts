@@ -1,4 +1,4 @@
-export function calculateProductPricing(item) {
+export function calculateProductPricing(item:any) {
   const p = item.product;
   const qty = item.quantity;
   const price = parseFloat(p.price);

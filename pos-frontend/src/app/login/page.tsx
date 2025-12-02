@@ -26,7 +26,7 @@ export default function LoginPage() {
     try {
       const response = await api.post<{
         data: any; token: string
-      }>('login', { email, password });
+      }>('auth/login', { email, password });
       setCookie('authToken', response.data.token, 7);
       toast.success('Login successful!');
       router.push('/');

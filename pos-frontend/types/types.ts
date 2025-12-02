@@ -1,50 +1,45 @@
-// types.ts
 export type CustomerGroup = "walkin" | "regular" | "dealer";
 
 export type TimeWindow = {
-  starts_at?: string; // ISO datetime
-  ends_at?: string;   // ISO datetime
+  starts_at?: string;
+  ends_at?: string;
 };
 
 export type TradeOffer = {
-  min_qty: number; // buy X
-  get_qty: number; // get Y free
+  min_qty: number;
+  get_qty: number;
 };
 
 export type Tier = {
-  min_qty: number; // threshold inclusive
+  min_qty: number;
   type: "percentage" | "fixed";
-  value: number; // percent or fixed per item
+  value: number;
 };
 
 export type DiscountDetails = {
-  // Basic discount
   type?: "percentage" | "fixed";
   value?: number;
 
-  // Trade offer
   trade_offer?: TradeOffer;
 
-  // Tiered discounts
-  tiers?: Tier[]; // ordered by min_qty ascending
+  tiers?: Tier[];
 
-  // Time window
   time_window?: TimeWindow;
 
-  // Customer group overrides
-  customer_group_overrides?: Partial<Record<CustomerGroup, { type: "percentage" | "fixed"; value: number }>>;
+  customer_group_overrides?: Partial<
+    Record<CustomerGroup, { type: "percentage" | "fixed"; value: number }>
+  >;
 };
 
-
 export interface Product {
-  id: string;
+  id: string;                  
   name: string;
   price: number;
   stock: number;
   min_stock: number;
-  discount_details?: {
-    type: 'percentage' | 'fixed';
-    value: number;
-  };
-  trade_offer_details?: string; 
+  image: string;
+  discount?: number | null;
+  discount_details?: DiscountDetails;
+  trade_offer_get_qty?: number;
+  trade_offer_min_qty?:number
 }

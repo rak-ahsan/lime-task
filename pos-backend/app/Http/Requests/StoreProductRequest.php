@@ -39,7 +39,7 @@ class StoreProductRequest extends FormRequest
                 ($this->filled('trade_offer_min_qty') || $this->filled('trade_offer_get_qty'))
             ) {
                 $validator->errors()->add(
-                    'discount',
+                    'discount', 
                     'A product cannot have both a discount and a trade offer.'
                 );
             }
