@@ -49,10 +49,7 @@ class ProductController extends Controller
     }
 
     public function update(UpdateProductRequest $request, string $id)
-    {
-
-        return $request;
-        
+    {        
         try {
             $product = $this->productService->updateProduct($id, $request->validated());
 

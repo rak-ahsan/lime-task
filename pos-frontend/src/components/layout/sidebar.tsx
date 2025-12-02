@@ -12,9 +12,19 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { logout } from "../../../lib/auth-actions";
+import { NavItem } from "../common/nav-item";
 
 export default function Sidebar() {
   const [open, setOpen] = useState(true);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
 
   return (
     <aside
@@ -46,47 +56,31 @@ export default function Sidebar() {
           <NavItem open={open} icon={<ShoppingBag />} label="Products" link="/products" />
           <NavItem open={open} icon={<BarChart2 />} label="POS" link="/pos" />
           <NavItem open={open} icon={<Settings />} label="Settings" link="/settings" />
-
-          {/* Example: Add many to test scroll */}
-          {/* [...Array(20)].map(_,i => <NavItem ... />) */}
         </nav>
       </div>
 
       {/* Footer (fixed) */}
       <div className="p-3 border-t shrink-0">
-        <NavItem open={open} icon={<LogOut />} label="Logout" link="/logout" />
+        <button
+          onClick={handleLogout}
+          className={cn(
+            "flex items-center gap-3 px-3 py-2 rounded-md w-full transition-all duration-300",
+            "text-muted-foreground hover:bg-muted",
+            !open && "justify-center"
+          )}
+        >
+          <LogOut className="h-5 w-5" />
+          <span
+            className={cn(
+              "whitespace-nowrap overflow-hidden transition-all duration-300",
+              open ? "opacity-100 max-w-xs" : "opacity-0 max-w-0"
+            )}
+          >
+            Logout
+          </span>
+        </button>
       </div>
     </aside>
   );
 }
 
-function NavItem({ icon, label, open, link }) {
-  const pathname = usePathname();
-  const isActive = pathname === link;
-
-  return (
-    <Link
-      href={link}
-      className={cn(
-        "flex items-center gap-3 px-3 py-2 rounded-md w-full transition-all duration-300",
-        isActive
-          ? "bg-primary/10 text-primary"
-          : "text-muted-foreground hover:bg-muted",
-        !open && "justify-center"
-      )}
-    >
-      {/* Icon */}
-      <span className={cn(isActive && "text-primary")}>{icon}</span>
-
-      {/* Label */}
-      <span
-        className={cn(
-          "whitespace-nowrap overflow-hidden transition-all duration-300",
-          open ? "opacity-100 max-w-xs" : "opacity-0 max-w-0"
-        )}
-      >
-        {label}
-      </span>
-    </Link>
-  );
-}

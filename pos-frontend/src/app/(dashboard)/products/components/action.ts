@@ -1,6 +1,6 @@
 import { fetchWithAuthJSON } from "@/lib/fetch";
-import { PaginatedResponse } from "../types/pagination";
-import { Product } from "../types/types";
+import { PaginatedResponse } from "../../../../../types/pagination";
+import { Product } from "../../../../../types/types";
 
 export async function fetchProducts(params: {
   page?: number;

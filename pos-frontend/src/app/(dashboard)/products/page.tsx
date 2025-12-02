@@ -1,4 +1,4 @@
-import { fetchProducts } from "../../../../lib/fetchProducts";
+import { fetchProducts } from "./components/action";
 import ProductCreate from "./components/create/product-create-form";
 import ProductsTable from "./components/tables";
 

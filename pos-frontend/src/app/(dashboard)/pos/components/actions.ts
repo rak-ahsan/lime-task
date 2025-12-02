@@ -2,14 +2,15 @@
 
 import { api } from "@/lib/api";
 import { revalidateTag } from "next/cache";
+import { fetchWithAuthJSON } from "@/lib/fetch";
 
 export async function getInitialPosProducts() {
-  const json = await api.get(`products?per_page=10`);
+  const json = await fetchWithAuthJSON(`products?per_page=10`);
   return json.data.data;
 }
 
 export async function searchProductsAction(term: string) {
-  const json = await api.get(`products?search=${term}`);
+  const json = await fetchWithAuthJSON(`products?search=${term}`);
   return json.data.data;
 }
 
