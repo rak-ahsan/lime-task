@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { calculateProductPricing } from "../../../../../lib/pricing";
 import { useCart } from "@/context/cart-context";
 
@@ -36,7 +37,7 @@ export default function CartTable({
 
       <CardContent>
         {cart.length === 0 ? (
-          <p className="text-center text-gray-500">No items in cart.</p>
+          <p className="text-center text-gray-500 py-8">No items in cart.</p>
         ) : (
           <Table>
             <TableHeader>
@@ -44,6 +45,7 @@ export default function CartTable({
                 <TableHead>Product</TableHead>
                 <TableHead>Price</TableHead>
                 <TableHead className="w-[100px]">Qty</TableHead>
+                <TableHead>Subtotal</TableHead>
                 <TableHead>Discount</TableHead>
                 <TableHead>Total</TableHead>
                 <TableHead></TableHead>
@@ -53,19 +55,57 @@ export default function CartTable({
             <TableBody>
               {cart.map((item) => {
                 const c = calculateProductPricing(item);
+                
+                // Check if discount/trade offer is currently active
+                const now = new Date();
+                const startDate = item.product.discount_or_trade_offer_start_date 
+                  ? new Date(item.product.discount_or_trade_offer_start_date) 
+                  : null;
+                const endDate = item.product.discount_or_trade_offer_end_date 
+                  ? new Date(item.product.discount_or_trade_offer_end_date) 
+                  : null;
+                
+                const isOfferActive = 
+                  (!startDate || now >= startDate) && 
+                  (!endDate || now <= endDate);
+                
+                const hasDiscount = 
+                  item.product.discount && 
+                  item.product.discount > 0 && 
+                  isOfferActive;
+                
+                const subtotal = item.product.price * item.quantity;
 
                 return (
                   <TableRow key={item.product.id}>
                     <TableCell className="font-medium">
-                      {item.product.name}
-                      {c.freeQty > 0 && (
-                        <p className="text-xs text-blue-500">
-                          Free: {c.freeQty} items (Trade Offer)
-                        </p>
-                      )}
+                      <div className="flex flex-col gap-1">
+                        <span>{item.product.name}</span>
+                        
+                        {hasDiscount && (
+                          <Badge variant="secondary" className="w-fit text-xs">
+                            {item.product.discount}% OFF
+                          </Badge>
+                        )}
+                        
+                        {c.freeQty > 0 && isOfferActive && (
+                          <span className="text-xs text-blue-600 font-medium">
+                            🎁 Free: {c.freeQty} items (Trade Offer)
+                          </span>
+                        )}
+                      </div>
                     </TableCell>
 
-                    <TableCell>${item.product.price}</TableCell>
+                    <TableCell>
+                      <div className="flex flex-col">
+                        <span>${Number(item.product.price).toFixed(2)}</span>
+                        {hasDiscount && (
+                          <span className="text-xs text-gray-500 line-through">
+                            ${Number(item.product.price).toFixed(2)}
+                          </span>
+                        )}
+                      </div>
+                    </TableCell>
 
                     <TableCell>
                       <Input
@@ -81,12 +121,22 @@ export default function CartTable({
                     </TableCell>
 
                     <TableCell>
-                      {item.product.discount
-                        ? `${item.product.discount}%`
-                        : "—"}
+                      <span className="text-gray-600">
+                        ${subtotal.toFixed(2)}
+                      </span>
                     </TableCell>
 
-                    <TableCell className="font-semibold">
+                    <TableCell>
+                      {hasDiscount ? (
+                        <span className="text-green-600 font-medium">
+                          -${c.discountAmount.toFixed(2)}
+                        </span>
+                      ) : (
+                        <span className="text-gray-400">—</span>
+                      )}
+                    </TableCell>
+
+                    <TableCell className="font-semibold text-lg">
                       ${c.finalPrice.toFixed(2)}
                     </TableCell>
 
@@ -96,7 +146,7 @@ export default function CartTable({
                         size="sm"
                         onClick={() => onRemove(item.product.id)}
                       >
-                        X
+                        ✕
                       </Button>
                     </TableCell>
                   </TableRow>

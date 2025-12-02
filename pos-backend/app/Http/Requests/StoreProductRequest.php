@@ -20,6 +20,7 @@ class StoreProductRequest extends FormRequest
             'name'        => 'required|string|max:255',
             'price'       => 'required|numeric|min:0',
             'stock'       => 'required|integer|min:0',
+            'min_stock'   => 'nullable|integer|min:0',
             'trade_offer_min_qty' => 'nullable|integer|min:0',
             'trade_offer_get_qty' => 'nullable|integer|min:0',
             'discount' => 'nullable|numeric|min:0|max:100',

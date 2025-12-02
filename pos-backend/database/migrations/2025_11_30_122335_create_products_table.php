@@ -12,6 +12,7 @@ return new class extends Migration
             $table->string('name');
             $table->decimal('price', 10, 2);
             $table->integer('stock');
+            $table->integer('min_stock')->nullable();
             $table->integer('trade_offer_min_qty')->nullable();
             $table->integer('trade_offer_get_qty')->nullable();
             $table->decimal('discount', 5, 2)->nullable();

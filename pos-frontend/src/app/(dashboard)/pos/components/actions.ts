@@ -22,6 +22,6 @@ export async function processSaleAction(payload:unknown) {
 
   } catch (e) {
     console.log("Sale error:", e);
-    return { success: false };
+    return { success: false, message: e };
   }
 }

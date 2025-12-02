@@ -42,7 +42,8 @@ export default function ProductsTable({ data }: ProductsTableProps) {
             <TableHead>ID</TableHead>
             <TableHead>Name</TableHead>
             <TableHead>Price</TableHead>
-            <TableHead colSpan={2}>Stock</TableHead>
+            <TableHead>Stock</TableHead>
+            <TableHead>Min Stock</TableHead>
             <TableHead>Discount</TableHead>
             <TableHead>Trade Offer</TableHead>
           </TableRow>
@@ -83,9 +84,9 @@ export default function ProductsTable({ data }: ProductsTableProps) {
                   <div className="flex items-center gap-2">
                     {p.stock}
 
-                    {p.stock < 50 ? (
+                    {p.stock < p.min_stock ? (
                       <Badge variant="destructive">Low Stock</Badge>
-                    ) : p.stock <= 20 ? (
+                    ) : p.stock <= p.min_stock ? (
                       <Badge variant="destructive">Low</Badge>
                     ) : null}
                   </div>

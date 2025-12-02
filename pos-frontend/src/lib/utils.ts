@@ -36,3 +36,9 @@ export function eraseCookie(name: string) {
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
+
+export function formatCurrency(value: number | undefined | null): string {
+  const numValue = Number(value);
+  if (isNaN(numValue)) return "$0.00";
+  return "$" + numValue.toFixed(2);
+}

@@ -37,7 +37,7 @@ export default function ProductForm({ product = null }: { product?: any }) {
       }
 
       console.log(res);
-      
+
 
       setOpen(false);
       toast.success(isEdit ? "Product updated!" : "Product created!");
@@ -98,7 +98,7 @@ export default function ProductForm({ product = null }: { product?: any }) {
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-3 gap-4">
               <div>
                 <Label>Price</Label>
                 <Input
@@ -127,6 +127,16 @@ export default function ProductForm({ product = null }: { product?: any }) {
                   <p className="text-red-500 text-sm">{errors.stock}</p>
                 )}
               </div>
+              <div>
+                <Label>Min Stock</Label>
+                <Input
+                  type="number"
+                  name="min_stock"
+                  defaultValue={product?.min_stock}
+                  className="mt-1"
+                />
+              </div>
+
             </div>
           </div>
 
@@ -228,8 +238,8 @@ export default function ProductForm({ product = null }: { product?: any }) {
                 ? "Updating..."
                 : "Saving..."
               : isEdit
-              ? "Update Product"
-              : "Save Product"}
+                ? "Update Product"
+                : "Save Product"}
           </Button>
         </form>
       </DialogContent>

@@ -43,3 +43,25 @@ export interface Product {
   trade_offer_get_qty?: number;
   trade_offer_min_qty?:number
 }
+
+export type BreakdownItem = {
+  product_id: number | string;
+  product_name: string;
+  quantity: number;
+  unit_price: number;
+  subtotal: number;
+  discount_amount?: number;
+  total_discount?: number;
+  trade_offer_applied?: boolean;
+  trade_offer_text?: string | null;
+  net_amount: number;
+};
+
+export type SaleBreakdownResponse = {
+  items: BreakdownItem[];
+  total_subtotal: number;
+  total_discount: any;
+  total_trade_offer_deduction: number;
+  final_total: any;
+
+};

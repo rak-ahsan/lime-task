@@ -60,6 +60,7 @@ class ProductFactory extends Factory
             'discount_or_trade_offer_start_date' => $start,
             'discount_or_trade_offer_end_date' => $end,
             'image' => $image,
+            'min_stock' => $this->faker->numberBetween(0, 50),
             'created_at' => $now,
             'updated_at' => $now,
         ];

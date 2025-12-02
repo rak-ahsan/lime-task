@@ -1,25 +1,21 @@
 "use client";
 
-import { useCart } from "@/context/cart-context";
-import { useEffect, useState, useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Product } from "../../../../../types/types";
+import { Product, SaleBreakdownResponse } from "../../../../../types/types";
 import { processSaleAction, searchProductsAction } from "./actions";
 import ProductSearch from "./ProductSearch";
 import CartTable from "./CartTable";
 import OrderSummary from "./OrderSummary";
+import { useCart } from "@/context/cart-context";
+import { useDebounce } from "@/hooks/debounch";
+import SaleBreakDown from "./SaleBreakDown";
 
-
-function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
-  useEffect(() => {
-    const handler = setTimeout(() => setDebouncedValue(value), delay);
-    return () => clearTimeout(handler);
-  }, [value, delay]);
-  return debouncedValue;
-}
-
-export default function PosClient({ initialProducts }: { initialProducts: Product[] }) {
+export default function PosClient({
+  initialProducts,
+}: {
+  initialProducts: Product[];
+}) {
   const {
     cart,
     addItemToCart,
@@ -30,24 +26,35 @@ export default function PosClient({ initialProducts }: { initialProducts: Produc
   } = useCart();
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchResults, setSearchResults] = useState<Product[]>(initialProducts);
+  const [searchResults, setSearchResults] = useState<Product[]>(
+    initialProducts || []
+  );
   const [loadingSearch, setLoadingSearch] = useState(false);
   const [processingSale, setProcessingSale] = useState(false);
+  const [saleBreakdown, setSaleBreakdown] =
+    useState<SaleBreakdownResponse | null>(null);
+  const [showBreakdown, setShowBreakdown] = useState(false);
 
   const debouncedSearch = useDebounce(searchTerm, 500);
   const totals = calculateTotals();
 
   useEffect(() => {
     const fetch = async () => {
-      if (debouncedSearch.length < 2) {
+      if (!debouncedSearch || debouncedSearch.length < 2) {
         setSearchResults([]);
         return;
       }
 
-      setLoadingSearch(true);
-      const data = await searchProductsAction(debouncedSearch);
-      setSearchResults(data);
-      setLoadingSearch(false);
+      try {
+        setLoadingSearch(true);
+        const data = await searchProductsAction(debouncedSearch);
+        setSearchResults(data || []);
+      } catch (err) {
+        console.error("search error", err);
+        toast.error("Search failed");
+      } finally {
+        setLoadingSearch(false);
+      }
     };
 
     fetch();
@@ -89,41 +96,95 @@ export default function PosClient({ initialProducts }: { initialProducts: Produc
       total_discount: totals.totalDiscount,
     };
 
-    const res = await processSaleAction(saleData);
+    try {
+      const res = await processSaleAction(saleData);
+      if (res?.success) {
+        toast.success("Sale processed successfully!");
+        let breakdown: SaleBreakdownResponse;
+        //@ts-ignore
+        if (res.breakdown) {
+          //@ts-ignore
+          breakdown = res.breakdown;
+          if (breakdown.total_subtotal === 0 || !breakdown.total_subtotal) {
+            breakdown.total_subtotal = breakdown.items.reduce(
+              (sum, item) => sum + (item.subtotal || 0),
+              0
+            );
+          }
+        } else {
+          const items = cart.map((c) => ({
+            product_id: c.product.id,
+            product_name: c.product.name,
+            quantity: c.quantity,
+            unit_price: c.product.price || 0,
+            subtotal: (c.product.price || 0) * c.quantity,
+            discount_amount: 0,
+            trade_offer_applied: false,
+            trade_offer_text: null,
+            net_amount: (c.product.price || 0) * c.quantity,
+          }));
 
-    if (res.success) {
-      toast.success("Sale processed successfully!");
-      clearCart();
-    } else {
+          breakdown = {
+            items,
+            total_subtotal: items.reduce((sum, item) => sum + item.subtotal, 0),
+            total_discount: totals.totalDiscount || 0,
+            total_trade_offer_deduction: 0,
+            final_total: totals.finalTotal || 0,
+          };
+        }
+
+        setSaleBreakdown(breakdown);
+        setShowBreakdown(true);
+        clearCart();
+      } else {
+        //@ts-ignore
+        toast.error(res?.message?.errors);
+      }
+    } catch (err) {
       toast.error("Failed to process sale.");
+    } finally {
+      setProcessingSale(false);
+      setSearchTerm("");
     }
+  };
 
-    setProcessingSale(false);
-    setSearchTerm("");
-
+  const handleCloseBreakdown = () => {
+    setShowBreakdown(false);
+    setSaleBreakdown(null);
   };
 
   return (
-    <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4 mt-5">
-      <ProductSearch
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-        searchResults={searchResults}
-        loadingSearch={loadingSearch}
-        onSelectProduct={handleProductSelect}
-      />
+    <>
+      <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
+        <div className="col-span-1 md:col-span-1">
+          <ProductSearch
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            searchResults={searchResults}
+            loadingSearch={loadingSearch}
+            onSelectProduct={handleProductSelect}
+          />
+        </div>
 
-      <CartTable
-        onQtyChange={handleQuantityChange}
-        onRemove={handleRemoveItem}
-      />
+        <div className="col-span-1 md:col-span-1">
+          <CartTable onQtyChange={handleQuantityChange} onRemove={handleRemoveItem} />
+        </div>
 
-      <OrderSummary
-        totals={totals}
-        processingSale={processingSale}
-        onProcessSale={handleProcessSale}
-        onClearCart={clearCart}
+        <div className="col-span-1 md:col-span-1">
+          <OrderSummary
+            totals={totals}
+            processingSale={processingSale}
+            onProcessSale={handleProcessSale}
+            onClearCart={clearCart}
+          />
+        </div>
+      </div>
+
+      <SaleBreakDown
+        breakdown={saleBreakdown}
+        open={showBreakdown}
+        onClose={handleCloseBreakdown}
       />
-    </div>
+    </>
   );
 }

@@ -86,7 +86,7 @@ class PosService
 
             $newStock = $product->stock - $totalQtyUsed;
 
-            if ($newStock < 5) {
+            if ($newStock < $product->min_stock) {
                 //send push notification or notification or sms logic can be added here
                 throw new \Exception("Selling this quantity will break min stock for {$product->name}");
             }
