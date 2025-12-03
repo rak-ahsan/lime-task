@@ -14,34 +14,25 @@ export default function Pagination({ current, last }: { current: number; last: n
     return `/products?${params.toString()}`;
   };
 
-  // Generate smart page numbers (only show nearby pages)
   const getPageNumbers = () => {
     const pages: (number | string)[] = [];
-    const delta = 2; // Show 2 pages before and after current
+    const delta = 2; 
 
-    // Always show first page
     pages.push(1);
-
-    // Calculate range around current page
     const rangeStart = Math.max(2, current - delta);
     const rangeEnd = Math.min(last - 1, current + delta);
-
-    // Add ellipsis after first page if needed
     if (rangeStart > 2) {
       pages.push("...");
     }
 
-    // Add pages around current
     for (let i = rangeStart; i <= rangeEnd; i++) {
       pages.push(i);
     }
 
-    // Add ellipsis before last page if needed
     if (rangeEnd < last - 1) {
       pages.push("...");
     }
 
-    // Always show last page (if there's more than 1 page)
     if (last > 1) {
       pages.push(last);
     }
@@ -76,7 +67,7 @@ export default function Pagination({ current, last }: { current: number; last: n
             href={getUrl(page as number)}
             active={current === page}
             size="icon"
-            prefetch={false} // ← CRITICAL: Disable prefetch!
+            prefetch={false} 
           >
             {page}
           </PageButton>
@@ -97,7 +88,7 @@ function PageButton({
   disabled,
   active,
   size = "default",
-  prefetch = false, // ← Add this prop
+  prefetch = false, 
   children,
 }: {
   href?: string;
