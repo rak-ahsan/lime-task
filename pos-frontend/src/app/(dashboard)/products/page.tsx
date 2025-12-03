@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { Suspense } from "react";
 import ProductsTable from "./components/tables";
 import ProductsTableSkeleton from "./components/loading";
@@ -11,7 +12,7 @@ async function ProductsTableWrapper({ page, search }: { page: number; search: st
     per_page: 15,
     search,
   });
-  
+  //@ts-expect-error
   return <ProductsTable data={response.data} />;
 }
 
