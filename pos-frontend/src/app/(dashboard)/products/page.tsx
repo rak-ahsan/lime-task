@@ -1,16 +1,29 @@
-import { fetchProducts } from "./components/action";
+import { Suspense } from "react";
 import ProductsTable from "./components/tables";
+import ProductsTableSkeleton from "./components/loading";
 
-export default async function ProductsPage({ searchParams }: { searchParams: { page?: string; search?: string } }) {
-  const params = await searchParams;
-  const page = Number(params.page ?? 1);
-  const search = params.search ?? "";
-
+// Create a separate Server Component for fetching
+async function ProductsTableWrapper({ page, search }: { page: number; search: string }) {
+  const { fetchProducts } = await import("./components/action");
+  
   const response = await fetchProducts({
     page,
     per_page: 15,
     search,
-  });  
+  });
+  
+  return <ProductsTable data={response.data} />;
+}
+
+export default async function ProductsPage({ 
+  searchParams 
+}: { 
+  searchParams: { page?: string; search?: string } 
+}) {
+  const params = await searchParams;
+  const page = Number(params.page ?? 1);
+  const search = params.search ?? "";
+
   return (
     <div className="space-y-8">
       <div>
@@ -21,9 +34,9 @@ export default async function ProductsPage({ searchParams }: { searchParams: { p
       </div>
 
       <div className="bg-card border rounded-xl p-4">
-        {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
-        {/* @ts-expect-error */}
-        <ProductsTable data={response.data} />
+        <Suspense fallback={<ProductsTableSkeleton />}>
+          <ProductsTableWrapper page={page} search={search} />
+        </Suspense>
       </div>
     </div>
   );
