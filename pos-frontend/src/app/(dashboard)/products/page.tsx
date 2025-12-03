@@ -3,7 +3,6 @@ import { Suspense } from "react";
 import ProductsTable from "./components/tables";
 import ProductsTableSkeleton from "./components/loading";
 
-// Create a separate Server Component for fetching
 async function ProductsTableWrapper({ page, search }: { page: number; search: string }) {
   const { fetchProducts } = await import("./components/action");
   

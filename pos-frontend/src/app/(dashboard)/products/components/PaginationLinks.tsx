@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 export default function Pagination({ current, last }: { current: number; last: number }) {
   const searchParams = useSearchParams();
@@ -13,26 +14,69 @@ export default function Pagination({ current, last }: { current: number; last: n
     return `/products?${params.toString()}`;
   };
 
+  // Generate smart page numbers (only show nearby pages)
+  const getPageNumbers = () => {
+    const pages: (number | string)[] = [];
+    const delta = 2; // Show 2 pages before and after current
+
+    // Always show first page
+    pages.push(1);
+
+    // Calculate range around current page
+    const rangeStart = Math.max(2, current - delta);
+    const rangeEnd = Math.min(last - 1, current + delta);
+
+    // Add ellipsis after first page if needed
+    if (rangeStart > 2) {
+      pages.push("...");
+    }
+
+    // Add pages around current
+    for (let i = rangeStart; i <= rangeEnd; i++) {
+      pages.push(i);
+    }
+
+    // Add ellipsis before last page if needed
+    if (rangeEnd < last - 1) {
+      pages.push("...");
+    }
+
+    // Always show last page (if there's more than 1 page)
+    if (last > 1) {
+      pages.push(last);
+    }
+
+    return pages;
+  };
+
   return (
     <div className="flex items-center justify-center gap-1 mt-6">
       {/* Previous */}
-      <PageButton
-        disabled={current <= 1}
-        href={getUrl(current - 1)}
-      >
+      <PageButton disabled={current <= 1} href={getUrl(current - 1)}>
         <span className="hidden sm:inline">Previous</span>
         <ChevronLeft />
       </PageButton>
 
       {/* Page Numbers */}
-      {[...Array(last)].map((_, i) => {
-        const page = i + 1;
+      {getPageNumbers().map((page, idx) => {
+        if (page === "...") {
+          return (
+            <span
+              key={`ellipsis-${idx}`}
+              className="inline-flex items-center justify-center size-9 text-muted-foreground"
+            >
+              ...
+            </span>
+          );
+        }
+
         return (
           <PageButton
             key={page}
-            href={getUrl(page)}
+            href={getUrl(page as number)}
             active={current === page}
             size="icon"
+            prefetch={false} // ← CRITICAL: Disable prefetch!
           >
             {page}
           </PageButton>
@@ -40,10 +84,7 @@ export default function Pagination({ current, last }: { current: number; last: n
       })}
 
       {/* Next */}
-      <PageButton
-        disabled={current >= last}
-        href={getUrl(current + 1)}
-      >
+      <PageButton disabled={current >= last} href={getUrl(current + 1)}>
         <span className="hidden sm:inline">Next</span>
         <ChevronRight />
       </PageButton>
@@ -56,12 +97,14 @@ function PageButton({
   disabled,
   active,
   size = "default",
+  prefetch = false, // ← Add this prop
   children,
 }: {
   href?: string;
   disabled?: boolean;
   active?: boolean;
   size?: "default" | "icon";
+  prefetch?: boolean;
   children: React.ReactNode;
 }) {
   const baseClasses =
@@ -79,16 +122,13 @@ function PageButton({
       : "border-transparent hover:bg-muted";
 
   if (disabled) {
-    return (
-      <span className={cn(baseClasses, sizes[size], states)}>
-        {children}
-      </span>
-    );
+    return <span className={cn(baseClasses, sizes[size], states)}>{children}</span>;
   }
 
   return (
     <Link
       href={href!}
+      prefetch={prefetch} // ← Pass prefetch prop
       className={cn(baseClasses, sizes[size], states)}
     >
       {children}
@@ -96,31 +136,3 @@ function PageButton({
   );
 }
 
-
-function ChevronLeft() {
-  return (
-    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M15 19l-7-7 7-7"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function ChevronRight() {
-  return (
-    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M9 5l7 7-7 7"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
