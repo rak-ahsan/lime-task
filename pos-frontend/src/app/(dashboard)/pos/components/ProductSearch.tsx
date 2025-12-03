@@ -49,7 +49,7 @@ export default function ProductSearch({
                   </p>
                 </div>
 
-                {product.stock <= product.min_stock && (
+                {Number(product.stock) <= Number(product.min_stock) && (
                   <span className="text-xs font-semibold text-red-600 bg-red-100 px-2 py-1 rounded-full">
                     Low Stock
                   </span>
