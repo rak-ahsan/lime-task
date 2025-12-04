@@ -20,7 +20,11 @@ export async function fetchProducts(params: {
   return fetchWithAuthJSON<PaginatedResponse<Product>>(
     `/products?${query}`,
     {
-      next: { tags: ['products'] } 
+      next: {
+        tags: ['products'],
+        revalidate: 3600
+      }
+
     }
   );
 }
