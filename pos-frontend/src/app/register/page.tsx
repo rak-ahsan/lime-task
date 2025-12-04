@@ -8,8 +8,12 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { api } from '@/lib/api';
 import { toast } from 'sonner';
-import { setCookie } from '@/lib/utils';
+import { parseLaravelErrors, setCookie } from '@/lib/utils';
 import Link from 'next/link';
+
+
+
+
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -26,17 +30,18 @@ export default function RegisterPage() {
     setError(null);
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match.");
-      toast.error("Passwords do not match.");
+      const msg = "Passwords do not match.";
+      setError(msg);
+      toast.error(msg);
       return;
     }
 
     if (password.length < 8) {
-      setError("Password must be at least 8 characters.");
-      toast.error("Password must be at least 8 characters.");
+      const msg = "Password must be at least 8 characters.";
+      setError(msg);
+      toast.error(msg);
       return;
     }
-
 
     setLoading(true);
 
@@ -48,14 +53,12 @@ export default function RegisterPage() {
         password_confirmation: confirmPassword
       });
 
-      // Save token for auto-login
       setCookie('authToken', res.token, 7);
-
       toast.success("Registration successful!");
       router.push('/');
     } catch (err: any) {
-      console.log(err);
-      const msg = 'Registration failed.';
+      const messages = parseLaravelErrors(err);
+      const msg = messages[0];
       setError(msg);
       toast.error(msg);
     } finally {

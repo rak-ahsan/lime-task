@@ -42,3 +42,21 @@ export function formatCurrency(value: number | undefined | null): string {
   if (isNaN(numValue)) return "$0.00";
   return "$" + numValue.toFixed(2);
 }
+
+
+export function parseLaravelErrors(err: any): string[] {
+  const axiosErrors = err?.response?.data?.errors;
+  if (axiosErrors && typeof axiosErrors === "object") {
+    // @ts-ignore
+    return Object.values(axiosErrors).flat().filter(Boolean);
+  }
+
+  const directErrors = err?.errors;
+  if (directErrors && typeof directErrors === "object") {
+    // @ts-ignore
+    return Object.values(directErrors).flat().filter(Boolean);
+  }
+
+  const msg = err?.response?.data?.message || err?.message;
+  return msg ? [msg] : ["Something went wrong."];
+}
