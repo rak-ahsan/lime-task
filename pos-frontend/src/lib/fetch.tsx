@@ -43,10 +43,7 @@ export async function fetchWithAuthJSON<T = any>(
 
   const responseClone = response.clone();
   const contentType = response.headers.get("content-type");
-  
-  console.log("=== Response Info ===");
-  console.log("Status:", response.status);
-  console.log("Content-Type:", contentType);
+
 
   if (response.status === 401) {
     console.log("Unauthorized - clearing auth token");

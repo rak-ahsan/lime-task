@@ -21,14 +21,11 @@ export default function Topbar() {
         className="w-72 bg-muted/30"
       />
 
-      {/* Right Side */}
-      <div className="flex items-center gap-4">
-        {/* User Dropdown */}
+      {/* <div className="flex items-center gap-4">
         <DropdownMenu>
           <DropdownMenuTrigger className="outline-none">
             <div className="flex items-center gap-3 cursor-pointer">
               <div className="h-9 w-9 rounded-full bg-muted overflow-hidden">
-                {/* Avatar -- Replace with actual user image */}
                 <img
                   src="/avatar-placeholder.png"
                   alt="User Avatar"
@@ -36,7 +33,6 @@ export default function Topbar() {
                 />
               </div>
 
-              {/* User info (hidden on small screens) */}
               <div className="hidden sm:flex flex-col text-left">
                 <span className="text-sm font-medium">Rakib Ahsan</span>
                 <span className="text-xs text-muted-foreground">Admin</span>
@@ -67,7 +63,7 @@ export default function Topbar() {
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
-      </div>
+      </div> */}
     </header>
   );
 }

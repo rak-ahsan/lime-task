@@ -31,6 +31,13 @@ export default function RegisterPage() {
       return;
     }
 
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters.");
+      toast.error("Password must be at least 8 characters.");
+      return;
+    }
+
+
     setLoading(true);
 
     try {
@@ -48,7 +55,7 @@ export default function RegisterPage() {
       router.push('/');
     } catch (err: any) {
       console.log(err);
-      const msg =  'Registration failed.';
+      const msg = 'Registration failed.';
       setError(msg);
       toast.error(msg);
     } finally {

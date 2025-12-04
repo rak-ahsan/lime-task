@@ -61,7 +61,7 @@ export default function ProductsTable({ data }: ProductsTableProps) {
               <TableRow
                 key={p.id}
                 className={
-                  p.stock < 10 || p.stock <= p.min_stock
+                  Number(p.stock) < Number(p.min_stock)
                     ? "bg-red-50/50"
                     : ""
                 }
@@ -84,11 +84,12 @@ export default function ProductsTable({ data }: ProductsTableProps) {
                   <div className="flex items-center gap-2">
                     {p.stock}
 
-                    {p.stock < p.min_stock ? (
+                    {Number(p.stock) < Number(p.min_stock) ? (
                       <Badge variant="destructive">Low Stock</Badge>
-                    ) : p.stock <= p.min_stock ? (
+                    ) : Number(p.stock) === Number(p.min_stock) ? (
                       <Badge variant="destructive">Low</Badge>
                     ) : null}
+
                   </div>
                 </TableCell>
 

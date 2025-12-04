@@ -55,7 +55,7 @@ export default function Sidebar() {
           <NavItem open={open} icon={<LayoutDashboard />} label="Overview" link="/" />
           <NavItem open={open} icon={<ShoppingBag />} label="Products" link="/products" />
           <NavItem open={open} icon={<BarChart2 />} label="POS" link="/pos" />
-          <NavItem open={open} icon={<Settings />} label="Settings" link="/settings" />
+          {/* <NavItem open={open} icon={<Settings />} label="Settings" link="/settings" /> */}
         </nav>
       </div>
 
